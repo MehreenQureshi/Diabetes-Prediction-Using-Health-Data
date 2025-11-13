@@ -1,0 +1,5 @@
+{
+  "name": "Diabetes Risk Predictor",
+  "description": "An application to predict the risk of diabetes based on key health metrics. It provides an analysis of the user's data and offers general wellness advice using AI.",
+  "requestFramePermissions": []
+}
