@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { HealthData, FormField } from '../types';
 
@@ -13,7 +12,9 @@ interface InputFormProps {
 const InputForm: React.FC<InputFormProps> = ({ healthData, setHealthData, onSubmit, isLoading, formFields }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setHealthData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+    // Ensure value is not negative if the user types manually, though min="0" handles the spinner
+    const numValue = parseFloat(value);
+    setHealthData(prev => ({ ...prev, [name]: isNaN(numValue) ? 0 : Math.max(0, numValue) }));
   };
 
   return (
@@ -29,17 +30,18 @@ const InputForm: React.FC<InputFormProps> = ({ healthData, setHealthData, onSubm
               type="number"
               id={field.id}
               name={field.id}
+              min="0"
               value={healthData[field.id]}
               onChange={handleChange}
               placeholder={field.placeholder}
-              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-slate-900 dark:text-slate-100"
               step="any"
             />
              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{field.description}</p>
           </div>
         ))}
       </div>
-       <div className="pt-4 sticky bottom-0 bg-white dark:bg-slate-800/50 py-3">
+       <div className="pt-4 sticky bottom-0 bg-white dark:bg-slate-800/50 py-3 backdrop-blur-sm">
          <button
             type="submit"
             disabled={isLoading}

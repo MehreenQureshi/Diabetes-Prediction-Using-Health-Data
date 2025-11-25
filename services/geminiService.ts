@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { HealthData, RiskLevel } from "../types";
 
@@ -6,17 +5,29 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 export async function getPredictionExplanation(data: HealthData, risk: RiskLevel): Promise<string> {
   const prompt = `
-    You are a helpful AI assistant providing information about diabetes risk factors.
-    A user has provided their health data and received a diabetes risk assessment.
-    Your task is to provide a clear, concise, and encouraging explanation of the result.
+    You are an AI assistant tasked with generating a structured health report section based on a user's health data for diabetes risk.
 
-    **Important Rules:**
-    1.  **DO NOT** provide medical advice.
-    2.  **ALWAYS** strongly recommend consulting a healthcare professional for any health concerns or before making any lifestyle changes.
-    3.  Explain which factors most contributed to the risk level.
-    4.  Provide general, well-known wellness tips related to diet, exercise, and stress management that can support a healthy lifestyle.
-    5.  Keep the tone positive and supportive.
-    6.  Format your response in simple Markdown. Use headings, bold text, and bullet points.
+    **Objective:**
+    Generate a detailed report that includes:
+    1.  **Introduction:** A brief, general overview of diabetes as a health concern and the importance of monitoring key health metrics.
+    2.  **Analysis of Your Health Metrics:** A personalized analysis of the user's provided data, explaining how each key factor (Glucose, BMI, Age, etc.) contributes to their calculated risk level.
+    3.  **Wellness Recommendations:** General, non-prescriptive advice on diet, exercise, and lifestyle that can support overall health.
+    4.  **Conclusion:** A concluding summary that reiterates the risk level and strongly emphasizes that this report is not medical advice and the user must consult a healthcare professional.
+
+    **Formatting Rules:**
+    - Use Markdown for formatting.
+    - Use the following headings exactly:
+        - ## Introduction
+        - ## Analysis of Your Health Metrics
+        - ## Wellness Recommendations
+        - ## Conclusion
+    - Use bullet points for lists (e.g., wellness tips), starting with a hyphen.
+    - Use bold text for emphasis.
+    - Keep the tone professional, encouraging, and supportive.
+
+    **Critical Safety Instructions:**
+    - **DO NOT** provide any medical diagnosis or prescribe treatment.
+    - **ALWAYS** include a clear and prominent disclaimer advising consultation with a doctor within the conclusion.
 
     **User's Data:**
     - Pregnancies: ${data.Pregnancies}
@@ -26,9 +37,9 @@ export async function getPredictionExplanation(data: HealthData, risk: RiskLevel
     - Age: ${data.Age} years
     - Diabetes Pedigree Function: ${data.DiabetesPedigreeFunction}
 
-    **Prediction Result:** ${risk} Risk
+    **Calculated Risk Level:** ${risk}
 
-    Now, please generate the explanation and wellness tips based on this information.
+    Please generate the report content now.
     `;
 
   try {
