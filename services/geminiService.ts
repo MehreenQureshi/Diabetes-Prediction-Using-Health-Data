@@ -1,10 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
 import { HealthData, RiskLevel } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
-
 export async function getPredictionExplanation(data: HealthData, risk: RiskLevel): Promise<string> {
-  const prompt = `
+  // Safe access to API Key with clear fallback for debugging
+  const apiKey = process.env.API_KEY;
+  
+  if (!apiKey) {
+    console.error("CRITICAL ERROR: API_KEY is missing from environment variables.");
+    return "Configuration Error: The AI API Key is missing. If you are the developer, please add 'API_KEY' to your Vercel Environment Variables.";
+  }
+
+  try {
+    // Initialize client inside the function to avoid top-level crashes if imports are unstable
+    const ai = new GoogleGenAI({ apiKey });
+
+    const prompt = `
     You are an AI assistant tasked with generating a structured health report section based on a user's health data for diabetes risk.
 
     **Objective:**
@@ -42,14 +52,14 @@ export async function getPredictionExplanation(data: HealthData, risk: RiskLevel
     Please generate the report content now.
     `;
 
-  try {
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt
     });
-    return response.text;
+    return response.text || "No analysis could be generated at this time.";
   } catch (error) {
     console.error("Error calling Gemini API:", error);
-    throw new Error("Could not get an explanation from the AI model.");
+    // Return a user-friendly message instead of crashing
+    return "Unable to generate the detailed analysis at this moment. Please check your network connection or API quota.";
   }
 }
